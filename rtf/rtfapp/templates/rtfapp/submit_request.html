@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'rtfapp/admin.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'rtfapp/navbar-green.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'rtfapp/rtf-navbar.css' %}" />
+
+<link rel="stylesheet" type="text/css" href="{% static 'rtfapp/bootstrap.min.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'rtfapp/rtf_submit_request.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'rtfapp/admin.css' %}" />
+<html lang="en">
+<meta name="viewport" content="width=width, initial-scale=1.0" />
+
+ <!-- Upload Maintenance Requests -->
+<head>
+    <meta charset="UTF-8">
+    <title>Maintenance Request | Rivanna Trails Foundation</title>
+</head> 
+
+<body class="rtf_wrapper">
+	<!-- Fixed navbar -->
+	<nav class="rtf_navbar-green">
+
+        <span><img src="{% static 'rtfapp/rtf_logo.png' %}" alt="RTF Logo" class="rtf_navbar-img" /></span>
+        <p class="rtf_navbar_title">Rivanna Trails Foundation</p>
+
+	</nav>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  	<script src="{% static 'rtfapp/ajaxSetup.js' %}"></script>
+  	
+  		<!-- Google Map -->
+  	<div id="mobilerequestMap">
+		<div class="rtf_hide-mobile rtf_submit-request-map map-wrapper col-md-8" id="mapWrapper">
+			<div id="googleMap" style="height:80vh;" class="rtf__map_display center-block">
+			</div>
+		</div>
+	</div>
+
+
+  	
+
+  	<!-- Request Submitted Feedback -->
+  	<div id="mobilerequestMessage" style="display: none;">
+  		<h4 class="rtf_request_title" id="mobilerequestMessage">Maintenance Request Submitted!</h4>
+		<button class="rtf_request_button rtf_green" type="button" class="btn btn-success" onclick="history.go(0)">Submit New Request</button>
+  	</div>
+
+  	<!-- Submit Maintenance Request -->
+	<form id="createMaintenanceRequest" style="display: inline-block;">
+
+		<h3 class="rtf_request_title">New Maintenance Request</h3>
+		<div class="rtf_mobile_request">
+			<form class="rtf_request_form" id="createMaintenanceRequestForm" action="" method="post">
+			    {% csrf_token %}
+			    <textarea rows="3" class="rtf_request_input" name="createMaintenanceRequestDescription" id="createMaintenanceRequestDescription" placeholder="Description of maintenance issue..."></textarea><br>
+			    
+			    <input type="text" name="createMaintenanceRequestLatitude" id="createMaintenanceRequestLatitude" readonly/>
+			    
+			    <input type="text" name="createMaintenanceRequestLongitude" id="createMaintenanceRequestLongitude" readonly/>
+		    
+			    <div class="rtf_lat_long">
+			        <div class="rtf_lat">Lat: 
+			      	    <span class="rtf_placeholder_text" id="createMaintenanceRequestLatitudeDisplay"> lat</span>
+			        </div>
+			        <div class="rtf_long">Long: 
+			      		<span class="rtf_placeholder_text" id="createMaintenanceRequestLongitudeDisplay"> long</span>
+			      	</div>
+			    </div>
+
+			    <button class="rtf_request_button rtf_translucent_green" type="button" onclick="getLocation()">Get Current Location</button><br>
+			    <button class="rtf_hide-mobile rtf_request_button rtf_translucent_green" type="button" onclick="allowMaintenanceRequestMapClick()">Pick Location on Map</button>
+			    
+			    
+			    <input class="rtf_request_input" name="createMaintenanceRequestUser" id="createMaintenanceRequestUser" placeholder="email@example.com"/>  <br>
+			   <!--  <button type="button" class="btn btn-danger" onclick="showCreateRequest(false)">Back</button> -->
+			    <button class="rtf_request_button rtf_green" type="button" class="btn btn-success" onclick="createRequest()">Submit</button> 
+		    </form>
+		</div>
+	</form>
+	<script src="{% static 'rtfapp/trails.js' %}"></script>
+	<script src="{% static 'rtfapp/maintenance-requests.js' %}"></script>
+
+	<!-- Javascript for Map code -->
+	  <script src="{% static 'rtfapp/jscolor.min.js' %}"></script>
+	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	  <script src="{% static 'rtfapp/ajaxSetup.js' %}"></script>
+	  <script src="https://maps.googleapis.com/maps/api/js?sensor=true&v=3"></script>
+	  <script type="text/javascript">
+	      // Page specific variables
+	      var map,
+	          // placemarks = ({{ placemarks|safe }}),
+	          trailpathsOnMap = [],
+	          currentPlacemark = -1,
+	          // parcels = ({{ parcels|safe }}),
+	          myLatlng = new google.maps.LatLng(38.04,-78.49),
+	          mapOptions = {
+	            zoom: 13,
+	            center: myLatlng,
+	            mapTypeId: google.maps.MapTypeId.HYBRID
+	          };
+	      
+	      // Initialize map based on 'googleMap' div
+	      map = new google.maps.Map(document.getElementById('googleMap'), mapOptions);
+
+	      /**
+	       * Function for other js files to hide content.
+	       * Calls functionality to: 
+	       *       Remove locations for maintenance requests that have not been created completely
+	       *       Hide InfoWindows for clicked Maintenance Requests
+	       */ 
+	      var hideOtherViews = function () {
+	        $("#trailDataWithoutContent").hide();
+	        $("#parcelDataWithContent").hide();
+	        $("#trailDataWithContent").hide();
+	        $("#trailDataEditContent").hide();
+	        $("#createMaintenanceRequest").hide();
+	        $("#maintenanceRequests").hide();
+	        $("#editMaintenanceRequest").hide();
+
+	        // Remove map marker for creating maintenance request
+	        removeCurrentLocationFromMap();
+
+	        // Hide tooltips for maintenance requests that may be open
+	        hideMaintenanceRequestInfoWindows();
+	      };
+
+	      /**
+	       * On map load, do the following:
+	       *       
+	       */
+	      google.maps.event.addDomListener(window, 'load', function () {
+	        // Initialize trail
+	        initialize();
+	        // Load parcels onto map
+	        loadParcels(parcels, map);
+	        // Load maintenance requests when map has loaded
+	        getRequests(false);
+	        // Start by checking if queued intersection is in progress
+	        checkIfInProgress();
+	      });
+	  </script>
+
+</body>
+</html>

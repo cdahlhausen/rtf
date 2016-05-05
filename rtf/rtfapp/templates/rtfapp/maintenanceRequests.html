@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'rtfapp/shared.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'rtfapp/bootstrap.min.css' %}" />
+<html lang="en">
+	<head>
+	    <meta charset="UTF-8">
+	    <title>Create Maintenance Request | Rivanna Trails Foundation</title>
+	    <style>
+		    .filters {
+		    	margin: 20px auto;
+		    }
+		    .content {
+		    	width: 70%;
+		    	margin: 0 auto;
+		    }
+		    .m-request {
+		    	margin: 20px 0;
+		    	border: 2px solid #424242;
+		    	padding: 10px 20px;
+		    	width: 500px;
+		    	cursor: pointer;
+		    }
+		    .m-request.selected {
+		    	box-shadow: inset 0 2px 1px rgba(0,0,0,.075),0 0 8px rgba(4, 255, 58, 0.97);
+		    	border-color: rgba(4, 255, 58, 0.97);
+		    }
+		    .error-list {
+		    	display: none;
+		    }
+		    .error {
+
+		    }
+		</style>	
+	</head>
+	<body>
+<body>
+<div class="content">
+	<h2>Maintenance Requests</h2>
+	<div class="filters" id="filters">
+		<h4>Filters:</h4>
+		<label>Status:
+			<select class="form-control" id="resolvedFilter" onchange="onFilterChange('resolved')">
+				<option default value="false">Open</option>
+				<option value="true">Closed</option>
+				<option value="">All</option>
+			</select>
+		</label>
+		<label>Description Conatins:
+			<input class="form-control" type="text" id="descriptionFilter" placeholder="Grass, bridge, etc.">
+		</label>
+		<label>Created By:
+			<input class="form-control" type="text" id="created_byFilter" placeholder="Name">
+		</label>
+		<button class="btn btn-info" type="button" id="clearFilters" onclick="clearFilters()">Clear Filters</button>
+	</div>
+	<div class="error-list">
+	</div>
+	<h3 style="display: none" id="noRequests">There are no maintenance requests</h3>
+
+	<div id="requestList">	
+	</div>
+	<div id="editButtons">
+		<button class="btn btn-primary">Edit Selected Request</button>
+		<button class="btn btn-success">Resolve Selected Request</button>
+		<button class="btn btn-danger">Cancel Edits</button>
+	</div>
+</div>	
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script type="text/javascript">
+	var mRequests = [],
+		openRequest = -1,
+		filters = {
+			'created_by': '',
+			'resolved': false,
+			'description': ''
+		};
+
+	var getRequests = function() {
+		var filters = {};
+		$.ajax({
+			url: "/rtfapp/getMaintenanceRequests/",
+			type: "GET",
+			data: filters,
+			success: function(json) {
+				mRequests = json;
+				var htmlString = "";
+				if(mRequests.length > 0) {
+					$("#noRequests").hide();
+					mRequests.forEach(function(r) {
+						htmlString += "<div class=\"m-request\" id=\"mRequest" + r["pk"] + "\">Maintenance Request " + r["pk"] + ":<br><ul>";
+						htmlString += "<li>Status: " + (r["fields"]["resolved"] ? "Closed" : "Open") + "</li>";
+						htmlString += "<li>Submitted: " + Date(r["fields"]["submit_timestamp"]) + "</li>";
+						htmlString += "<li>Created by: " + r["fields"]["created_by"] + "</li>";
+						htmlString += "<li>Location: " + r["fields"]["location"] + "</li>";
+						htmlString += "<li>Description: " + r["fields"]["description"] + "</li>";
+						htmlString += "</ul></div>";
+					});
+				} else {
+					$("#noRequests").show();
+				}
+				$("#requestList").html(htmlString);
+				$('.m-request').click(function() {
+					if($(this).hasClass('selected')) {
+						openRequest = -1;
+					} else {
+						if(openRequest !== -1) { $('#mRequest'+openRequest).removeClass('selected'); }						
+						openRequest = Number($(this).attr('id').substr(8));						
+					}
+					$(this).toggleClass('selected');
+				});
+			},
+			error: function(xhr, errmsg, err) {
+				console.log("ERROR:" + errmsg);
+			}
+		});
+	}
+	var editRequest = function(id, open) {
+		if(open) {
+
+		} else {
+
+		}
+	}
+	var saveEdit = function(id, request) {
+		var mRequest = {};
+		$.ajax({
+			url: "editMaintenanceRequest/",
+			type: "POST",
+			data: $.param(mRequest),
+			success: function(json) {
+
+			},
+			error: function(xhr, errmsg, err) {
+				console.log("ERROR:" + errmsg);
+			}
+		});
+	}
+	var getRequestWithId = function(id) {
+		for(var i = 0; i < mRequests.length; i++) {
+			if(mRequests[i]["pk"] === id) {
+				return mRequests[i];
+			}
+		}
+		return -1;
+	}
+	var onFilterChange = function(filter) {
+		var newVal = $('#'+filter + 'Filter').val();
+		if(filters[filter] !== newVal) {
+			// console.log("MY VALUE HAS CHANGED");
+			filters[filter] = newVal;
+			applyFilters(filter);
+		}		
+	}
+	var applyFilters = function(filter) {		
+		var toShow, toShowCount = 0;
+		mRequests.forEach(function(request) {
+			toShow = true;
+			if(filters['created_by'] !== '' && toShow) {
+				toShow = request["fields"]["created_by"].indexOf(filters['created_by']) > -1;
+			}
+			if(filters['description'] !== '' && toShow) {
+				toShow = request["fields"]["description"].indexOf(filters['description']) > -1;
+			}
+			if(filters['resolved'] !== '' && toShow) {
+				toShow = request["fields"]["resolved"] == (filters['resolved'] === "true");
+			}
+			if(toShow) {
+				$('#mRequest'+request["pk"]).show();
+				toShowCount++;
+			} else {
+				if(openRequest === request["pk"]) {
+					$('#mRequest'+request["pk"]).removeClass('selected');
+					openRequest = -1;
+				}
+				$('#mRequest'+request["pk"]).hide();				
+			}
+		});
+		if(toShowCount === 0) {
+			$("#noRequests").show();
+		} else {
+			$("#noRequests").hide();			
+		}
+	}
+	var clearFilters = function() {
+		filters = {
+			'created_by': '',
+			'resolved': 'false',
+			'description': ''
+		};
+		$('#resolvedFilter').val("false");
+		$('#descriptionFilter').val("");
+		$('#created_byFilter').val("");
+		applyFilters();
+	}
+	getRequests();
+	$(document).ready(function() {
+		$("#descriptionFilter").on("input", function() {
+			onFilterChange('description');
+		});
+		$("#created_byFilter").on("input", function() {
+			onFilterChange('created_by')
+		});
+	});
+</script>
+
+{% load static %}
+<script type="text/javascript" src="{% static 'rtfapp/ajaxSetup.js' %}" />
+</body>
+</html>

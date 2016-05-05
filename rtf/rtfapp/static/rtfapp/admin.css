@@ -1,0 +1,164 @@
+@import "shared.css";
+.rtf__header_box {
+    /*border-width: 10px;*/
+    position: relative;
+    background-color: #0C8040;
+    margin-left: auto;
+    margin-right: auto;
+    width: max-width;
+    height: 80px;
+    font-family: 'Helvetica Neue';
+    color: white;
+    text-decoration: none;
+    font-size: 3vw;
+}
+.rtf__button_dark_green {
+    background-color: #1D9B57;
+    text-decoration: none;
+    color: white;
+
+}
+.rtf__image_logo{
+    width:150px;
+}
+
+.rtf-logout-button {
+    background-color: #1D9B57;
+    text-decoration: none;
+    color: white;
+}
+
+.navbar > .container {
+    width: 98% !important;
+}
+
+.navbar, .navbar > .container, .navbar-header, .navbar-collapse, .navbar-brand {
+    height: 80px !important;
+}
+
+.navbar-img { 
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    display: inline-block;
+}
+
+.navbar-brand {
+    font-size: 34px !important;
+}
+
+.nav-btn {
+    font-size: 26px;
+    height: 50px !important;
+    margin: 15px 4px;
+    transition: all 500ms ease;
+}
+
+.nav-btn-small {
+    font-size: 15px;
+    text-align: center;
+    height: 25px;
+    margin: 5px;
+    transition: all 500ms ease;
+}
+
+.content {
+    margin-top: 80px;
+}
+
+form, div.match-form {
+    display: inline-block;
+    width: 80%;
+    margin: 0% 10%;
+    padding: 15px;
+}
+form > label {
+    margin: 8px 0px;
+}
+textarea, input[type='text'] {
+    width: 100%;
+}
+button, input[type='submit'] {
+    margin: 8px 0px;
+    min-width: 40%;
+}
+input[type='submit'] {
+    margin: 8px 30%;
+}
+input#createMaintenanceRequestLatitude, input#createMaintenanceRequestLongitude {
+    display: none;
+}
+div.fullWidthBar {
+    background-color: #f9f9f9;
+    color: #1a1a1a;
+    display: inline-block;
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 10px;
+}
+div.barLabel {
+    display: inline-block;
+    margin-right: 4px;
+}
+textarea {
+    resize:none;
+}
+.filters {
+    margin: 20px auto;
+}
+.m-request {
+    margin: 20px 0;
+    border: 2px solid #424242;
+    padding: 10px 20px;
+    width: 500px;
+    cursor: pointer;
+}
+.m-request.selected {
+    box-shadow: inset 0 2px 1px rgba(0,0,0,.075),0 0 8px rgba(4, 255, 58, 0.97);
+    border-color: rgba(4, 255, 58, 0.97);
+}
+.error-list {
+    display: none;
+}
+.error {
+
+}
+.requests-list {
+    height: 200px;
+    margin-bottom: 10px;
+    overflow-y: scroll;
+}
+#maintenanceRequests, #createMaintenanceRequest, #editMaintenanceRequest {
+    display: none;
+}
+
+#queuedIntersection {
+    display: none;
+}
+
+#parcelDataWithContent {
+    display: none;
+}
+
+.upload-trail-wrapper {
+    display: none;
+}
+
+.queue-message {
+    text-align: center;
+}
+
+.alert-message {
+    display: block;
+    padding: 1.5em;
+}
+
+#queueError {
+    display: none;
+}
+
+#parcelStatusChoose > button {
+    min-width: 0px;
+    width: 30%;
+}

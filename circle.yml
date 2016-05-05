@@ -1,0 +1,15 @@
+machine:
+    python:
+        version: 2.7.6
+
+dependencies:
+    pre:
+      - pip install --upgrade pip
+      - pip install -q Django==1.8.4
+      - pip install fastkml
+      - pip install pylint
+
+test:
+    override:
+      - cd rtf; python manage.py test rtfapp/tests
+      # - pylint rtf/rtf/rtfapp/

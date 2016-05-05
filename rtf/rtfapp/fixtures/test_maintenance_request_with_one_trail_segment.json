@@ -1,0 +1,1 @@
+[{"fields": {"resolved": false, "submit_timestamp": "2015-11-02T17:35:19Z", "resolved_timestamp": "2015-11-02T17:35:01Z", "description": "This is a test maintenance request", "created_by": "Michael", "location": "0,0"}, "model": "rtfapp.maintenancerequest", "pk": 1}]

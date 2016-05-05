@@ -1,0 +1,35 @@
+{% if parcels %}
+	<h2>{{ parcels | length }} parcels were found!</h2>
+	<ul>
+		{% for parcel in parcels %}
+			<li>
+				Parcel {{forloop.counter}} - <br/>
+				<ul>
+				
+					<li>Parcel ID: {{parcel.id}}</li>
+					<li>Owner: {{parcel.owner}}</li>
+					<li>Points: {{parcel.points}}</li>
+					
+				</ul>
+			</li>
+		{% endfor %}
+	</ul>
+{% else %}
+	<h2>Upload a Zipped Shapefile for land parcels</h2>
+
+	<form action="{% url 'rtfapp:uploadCounty' %}" method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+		<label>
+			County Shp Zip:<br/>
+			<input type="file" name="countyShpFiles" id="countyShpFiles" accept=".zip" />
+		</label>
+		<br><br>
+		<label>
+			County Excel Zip:<br/>
+			<input type="file" name="countyExcelFiles" id="countyExcelFiles" accept=".zip" />
+		</label>		
+		<br><br>
+		<br><br>
+		<input type="submit" value="Upload" />
+	</form>
+{% endif %}

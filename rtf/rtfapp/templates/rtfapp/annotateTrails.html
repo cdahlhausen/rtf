@@ -1,0 +1,22 @@
+<!-- temp file for implementing trail annotations -->
+<!-- merge with main dashboard (click to select lines) -->
+
+<!DOCTYPE html>
+<html>
+<head><title>Annotate Trails</title></head>
+<body>
+	{% if trails %}
+	<!-- <select name="trail_id"> -->
+	<ul>
+		{% for trail in trails %}
+<!-- 		<option value="{{ trail.id }}">{{ trail.name }}</option> -->
+		<li><a href="{% url 'rtfapp:edit_trail' trail.id %}">{{trail.name}}</a></li>
+		{% endfor %}
+	</ul>
+<!-- 	</select>
+	</form> -->
+	{% else %}
+	<h2>No Trails Found</h2>
+	{% endif %}
+</body>
+<html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'rtfapp/shared.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'rtfapp/bootstrap.min.css' %}" />
+
+<html lang="en">
+	<head>
+	    <meta charset="UTF-8">
+	    <title>Create Maintenance Request | Rivanna Trails Foundation</title>
+	    <style>
+		    body {
+		    	padding: 15px;
+		    }
+	    	#map {
+	    		height: 300px;
+	    		width: 400px;
+	    		margin: 0 auto;
+	    	}
+	    	h2 {
+	    		text-align: center;
+	    	}
+	    	form {
+	    		display: inline-block;
+	    		width: 20%;
+	    		margin: 0% 40%;
+	    		padding: 15px;
+	    	}
+	    	form > label {
+	    		margin: 8px 0px;
+	    	}
+	    	textarea, input[type='text'] {
+	    		width: 100%;
+	    	}
+	    	button, input[type='submit'] {
+	    		margin: 8px 0px;
+	    		min-width: 40%;
+	    	}
+	    	input[type='submit'] {
+	    		margin: 8px 30%;
+	    	}
+	    	input#latitude, input#longitude {
+	    		display: none;
+	    	}
+	    	div.fullWidthBar {
+	    		background-color: #f9f9f9;
+	    		color: #1a1a1a;
+	    		display: inline-block;
+	    		width: 100%;
+	    		padding: 8px;
+	    		border-radius: 5px;
+	    		font-size: 10px;
+	    	}
+	    	div.barLabel {
+	    		display: inline-block;
+	    		margin-right: 4px;
+	    	}
+	    	textarea {
+	    		resize:none;
+	    	}
+	    </style>
+	</head>
+	<body>
+		<div id="map"></div>
+
+		{% if success %}
+			<h2>Maintenance Request Submitted!</h2>
+		{% endif %}
+		<h2>Upload a Maintenance Request</h2>
+
+		<form action="{% url 'rtfapp:createMaintenanceRequest' %}" method="post">
+			{% csrf_token %}
+			<label>Description</label><br>
+			<textarea rows="3" name="description" id="description"></textarea><br>
+			<input type="text" name="latitude" id="latitude" readonly/><input type="text" name="longitude" id="longitude" readonly/>
+			<button type="button" onclick="allowMaintenanceRequestMapClick()">Pick Location</button>
+			<button type="button" onclick="getLocation()">Get Current Location</button><br>
+			<div class="fullWidthBar">
+				<div class="barLabel">Lat:</div> <span id="latitudeDisplay">NaN</span>
+				<div class="barLabel">Long:</div> <span id="longitudeDisplay">NaN</span>
+			</div>
+			<label>Created By</label><br>
+			<input type="text" name="user" id="user"/>	<br>
+			<input type="submit" value="Upload" />
+		</form>
+
+		<script type="text/javascript">
+			var map;
+			var currentLocation;
+			var zoomedIn = false;
+
+			function initMap() {
+			  map = new google.maps.Map(document.getElementById('map'), {
+			    center: {lat: 38.033511, lng: -78.495660},
+			    zoom: 12
+			  });
+			}
+			function setFormFieldLocation(lat, lng) {
+				document.getElementById('latitude').value = lat;
+		    	document.getElementById('longitude').value = lng;
+		    	document.getElementById('latitudeDisplay').innerHTML = lat;
+		    	document.getElementById('longitudeDisplay').innerHTML = lng;
+			}
+			function setLocation(position) {
+				setFormFieldLocation(position.coords.latitude, position.coords.longitude);
+		    	addCurrentLocationToMap({lat: position.coords.latitude, lng: position.coords.longitude}, true);
+			}
+			function getLocation() {
+			    if (navigator.geolocation) {
+			        navigator.geolocation.getCurrentPosition(setLocation);
+			    } else {
+			        alert("Cannot access device location, please select a location on the map.");
+			    }
+			}
+			function allowMaintenanceRequestMapClick() {
+				// Remove previous marker
+				if (currentLocation !== undefined && currentLocation != null) {
+					currentLocation.setMap(null);
+					currentLocation = null;
+				}
+
+				alert("Go ahead, click the map.");
+
+				// Clear previous click listeners
+				google.maps.event.clearListeners(map, 'click');
+
+				map.addListener('click', function (e) {
+					// Clear click listener
+					google.maps.event.clearListeners(map, 'click');
+
+					// Set form fields
+					setFormFieldLocation(e.latLng.lat(), e.latLng.lng());
+
+					// Add location to map
+					addCurrentLocationToMap(e.latLng, !zoomedIn);
+				});
+			}
+			function addCurrentLocationToMap(location, pan) {
+				if (currentLocation !== undefined && currentLocation != null) {
+					console.log("Removing old location from map");
+					currentLocation.setMap(null);
+					currentLocation = null;
+				}
+
+				currentLocation = new google.maps.Marker({
+			        position: location,
+			        title: 'Maintenance Request',
+			        map: map
+			    });
+
+			    if (pan) {
+			    	map.panTo(location);
+			    }
+
+			    map.setZoom(16);
+			    zoomedIn = true;
+			}
+		</script>
+		<script async defer
+		  src="https://maps.googleapis.com/maps/api/js?callback=initMap">
+		</script>
+	</body>
+</html>

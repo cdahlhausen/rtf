@@ -1,0 +1,11 @@
+<h1>{{trail.name}}</h1>
+<form action="{% url 'rtfapp:edit_trail' trail.id %}" method="POST">
+	{% csrf_token %}
+	{% for field in form.visible_fields %}
+	{{ field.errors }} <br>
+	{{ field.label_tag }}<br>
+	{{ field }}<br>
+	{% endfor %}
+
+	<input type="submit" value="Submit"/>
+</form>

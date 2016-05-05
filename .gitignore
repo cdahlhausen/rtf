@@ -1,0 +1,9 @@
+*.log
+*.pot
+*.pyc
+.idea/
+rtf/rtf/settings.py
+rtf/settings.py
+rtf/vrtf/
+rtf/rtf/server_settings.py
+.DS_Store

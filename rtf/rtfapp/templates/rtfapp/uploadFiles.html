@@ -1,0 +1,46 @@
+{% load staticfiles %}
+{% if placemarks %}
+	<h2>{{ placemarks | length }} placemarks were found!</h2>
+	<ul>
+		{% for placemark in placemarks %}
+			<li>{{ placemark.name }} <br />
+				<ul>
+					<li>{{ placemark.description }}</li>
+					<li>Atoms ({{ placemark.atoms | length }}):
+						<ul>
+							{% for atom in placemark.atoms %}
+								<li>Atom {{forloop.counter}}: {{atom.coordinates}}
+								<ul>
+									<li>Parcel: {{ atom.parcel }} </li>
+								</ul>
+								</li>
+							{% endfor %}
+						</ul>
+					</li>
+
+				</ul>
+			</li>
+		{% endfor %}
+	</ul>
+{% else %}
+<link rel="stylesheet" type="text/css" href="{% static 'rtfapp/upload.css' %}" />
+	{% if errors %}
+		<h4>Errors occurred preventing upload</h4>
+		<ul>
+		{% for error in errors %}
+			<li>{{ error }}</li>
+		{% endfor %}
+		</ul>
+	{% endif %}
+<html lang="en">
+	<head>
+    <meta charset="UTF-8">
+    <title>Upload a KMZ for trail segments and Zipped Shapefile for land parcels</title>
+	</head>
+	<div class="rtf__upload_box">
+		<p class = "rtf__upload_header_text">
+			Upload a KMZ for trail segments and Zipped Shapefile for land parcels
+		</p>
+	
+</div>
+{% endif %}

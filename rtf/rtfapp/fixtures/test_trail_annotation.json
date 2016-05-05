@@ -1,0 +1,12 @@
+[{
+	"fields": {
+		"trail_status": "Open", 
+		"current_conditions": "Good", 
+		"name": "Trail Segment 1", 
+		"difficulty": 1, 
+		"last_edit": "2015-11-02T17:34:25Z", 
+		"description": "Test trail segment"
+	}, 
+	"model": "rtfapp.trailsegment", 
+	"pk": 1
+}]

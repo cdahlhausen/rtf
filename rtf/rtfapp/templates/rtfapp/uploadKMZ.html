@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+
+{% if placemarks %}
+	<h2>{{ placemarks | length }} placemarks were found!</h2>
+	<ul>
+		{% for placemark in placemarks %}
+			<li>{{ placemark.name }} <br />
+				<ul>
+					<li>{{ placemark.description }}</li>
+					<li>Line segments:
+						<ul>
+							{% for line_segment in placemark.line_segments %}
+								<li>Line Segment:
+									<ul>
+										{% for coords in line_segment.coordinates %}
+											<li>{{ coords.latitude }}, {{ coords.longitude }}, {{ coords.elevation }}</li>
+										{% endfor %}
+									</ul>
+								</li>
+							{% endfor %}
+						</ul>
+					</li>
+
+				</ul>
+			</li>
+		{% endfor %}
+	</ul>
+{% else %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'rtfapp/upload.css' %}" />
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload a KMZ for trail segments</title>
+</head>
+<body>
+	<div class="rtf__upload_box">
+		<p class = "rtf__upload_header_text">
+			Segment
+		</p>
+    	<form action="{% url 'rtfapp:uploadKMZ' %}" method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+			<div class="fileUpload rtf__button_flat rtf__upload_button_green">
+			    <span>Choose File</span>
+			    <input type="file" class = "upload" name="kmzFile" id="kmzFile" accept=".kmz" />
+			</div>
+			</br>
+			<div class= "fileUpload rtf__button_flat rtf__upload_button_blue">
+				<span>Upload</span>
+				<input type = "submit" class = "upload" value="Upload"/>
+			</div>
+				
+		</form>
+	</div>
+</body>
+</html>
+
+
+{% endif %}

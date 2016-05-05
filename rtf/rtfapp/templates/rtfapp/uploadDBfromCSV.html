@@ -1,0 +1,44 @@
+{% load staticfiles %}
+{% if done %}
+	<h2>Upload was successful!</h2>
+{% else %}
+<link rel="stylesheet" type="text/css" href="{% static 'rtfapp/upload.css' %}" />
+	{% if errors %}
+		<h4>Errors occurred preventing upload</h4>
+		<ul>
+		{% for error in errors %}
+			<li>{{ error }}</li>
+		{% endfor %}
+		</ul>
+	{% endif %}
+<html lang="en">
+	<head>
+    <meta charset="UTF-8">
+    <title>Restore the Database from Backup</title>
+	</head>
+	<div class="rtf__upload_box">
+		<p class = "rtf__upload_header_text">
+			Upload a Database Backup zip file
+		</p>
+	<form action="{% url 'rtfapp:uploadDB' %}" method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+		<br>
+		<label style="padding-left:7em">
+			db.zip file:
+		</label>
+				<div class="fileUpload rtf__button_flat rtf__upload_button_green">
+				    <span>Choose File</span>
+				    <input type="file" class = "upload" name="dbFile" id="dbFile" accept=".zip" />
+				</div>
+
+		<br><br><br>
+			<div style="padding-left:14.3em" />  
+				<div class= "fileUpload rtf__button_flat rtf__upload_button_blue">
+					<span>Upload</span>
+					<input type = "submit" class = "upload" value="Upload"/>
+				</div>
+			</div>
+	</form>
+</div>
+{% endif %}
+</html>

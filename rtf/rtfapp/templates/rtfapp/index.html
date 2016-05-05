@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'rtfapp/shared.css' %}" />
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rivanna Trails Foundation</title>
+</head>
+<body class="rtf__landing_body">
+    <div class ="rtf__landing_box">
+        <div class="rtf__landing_content">
+
+            <p class= "rtf__landing_text">
+                Welcome to the Rivanna Trail Foundation. 
+            </p>
+            
+            <a class="rtf__button_flat rtf__button_green" href="{% url 'login' %}">
+                Log In
+            </a>
+
+        </div>
+    </div>
+</body>
+</html>

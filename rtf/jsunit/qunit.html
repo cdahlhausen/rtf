@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>QUnit Example</title>
+  <link rel="stylesheet" href="res/qunit-1.22.0.css">
+</head>
+<body>
+  <div id="qunit"></div>
+  <!-- Fixtures -->
+  <div id="qunit-fixture">
+  	<!-- Maintenance Requests -->
+  	<div id="locationFormFieldFixtures">
+  		<input type="text" id="createMaintenanceRequestLatitude" />
+  		<input type="text" id="createMaintenanceRequestLongitude" />
+  		<span id="createMaintenanceRequestLatitudeDisplay"></span>
+  		<span id="createMaintenanceRequestLongitudeDisplay"></span>
+  	</div>
+    <!-- Map -->
+    <div id="googleMap" style="width: 400px; height: 400px;">
+    </div>
+    <!-- Fake maintenance requests -->
+    <div id="requestList"></div>
+    <!-- Fake edit request form -->
+    <div id="editRequest">
+      <textarea name="editMaintenanceRequestDescription"></textarea>
+      <input type="text" name="editMaintenanceRequestUser" />
+      <span id="editMaintenanceRequestLatitude"></span>
+      <span id="editMaintenanceRequestLongitude"></span>
+      <select name="editMaintenanceRequestResolved">
+        <option value="true">Closed</option>
+        <option value="false">Open</option>
+      </select>
+    </div>
+    <!-- Fake create request form -->
+    <div id="createRequest">
+      <textarea name="createMaintenanceRequestDescription"></textarea>
+      <input name="createMaintenanceRequestUser" style="background-color: #FFFFFF;" />
+      <input name="createMaintenanceRequestLatitude" />
+      <input name="createMaintenanceRequestLongitude" />
+      <span id="createMaintenanceRequestLatitude"></span>
+      <span id="createMaintenanceRequestLongitude"></span>
+    </div>
+    <!-- Fake divs for requests -->
+    <div id="maintenanceRequests"></div>
+    <div id="editMaintenanceRequest"></div>
+    <div id="createMaintenanceRequest"></div>
+    <div id="mrequestMessage"></div>
+    <!-- Fake filters for requests -->
+    <div id="maintenanceRequestFilters">
+      <input type="text" id="descriptionFilter" />
+      <input type="text" id="created_byFilter" />
+      <select id="resolvedFilter">
+        <option selected value="false">Open</option>
+        <option value="true">Closed</option>
+      </select>
+      <div id="noRequests"></div>
+      <div id="mRequest1"></div>
+    </div>
+    <!-- Queue intersection forms -->
+    <div id="queue">
+      <div id="kmzFile" name="kmzFile" />
+      <div id="pointFiles" name="pointFiles" />
+      <div id="areaFiles" name="areaFiles" />
+      <div id="countyShpFiles" name="countyShpFiles" />
+      <div id="countyExcelFiles" name="countyExcelFiles" />
+
+      <div id="queueErrorMessage"></div>
+      <div id="intersectionQueueMessage"></div>
+
+      <div id="uploadTrailForm" style="display: none;"></div>
+      <div id="mapWrapper" style="display: none;"></div>
+      <div id="backToMapButton" style="display: none;"></div>
+      <div id="uploadTrailButton" style="display: none;"></div>
+      <div id="intersectionPercentComplete"></div>
+      <div id="intersectionProgressBar"></div>
+      <div id="noQueuedIntersection"></div>
+      <div id="queuedIntersection"></div>
+    </div>
+  </div>
+  <!-- QUnit Tests -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?sensor=true&v=3"></script>
+  <script src="res/qunit-1.22.0.js"></script>
+  <script src="res/blanket.min.js"></script>
+  <!-- JS Files Tested -->
+  <script src="../rtfapp/static/rtfapp/ajaxSetup.js" data-cover></script>
+  <script src="../rtfapp/static/rtfapp/maintenance-requests.js" data-cover></script>
+  <script src="../rtfapp/static/rtfapp/parcels.js" data-cover></script>
+  <script src="../rtfapp/static/rtfapp/queue-intersection.js" data-cover></script>
+  <script src="../rtfapp/static/rtfapp/trails.js" data-cover></script>
+  <!-- JS Tests -->
+  <script src="tests.js"></script>
+</body>
+</html>
