@@ -1,0 +1,7 @@
+# [localhost]
+# localhost ansible_connection=local host_eip=127.0.0.1
+
+[personal]
+rtfaws ansible_user=ubuntu hostname_name=rtf-aws system_default_user=ubuntu
+
+
