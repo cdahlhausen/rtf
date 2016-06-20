@@ -3,5 +3,33 @@
 #
 
 - hosts: rtf_server
+  vars:
+    rtf_root: "/srv/rtf"
   roles:
     - ansible.mysql
+    - ansible.nginx
+    - ansible.Rockabox.wsgi
+
+  tasks:
+    - name: Install dependencies
+      apt: name="{{iten}}" state=present
+      with_items:
+        - libgeos-dev
+        - python-dev
+        - python-mysqldb
+
+    - name: Upgrade PIP
+      become: yes
+      shell: sudo pip install --upgrade pip
+
+    - name: Pull latest code
+      git: repo=https://github.com/cdahlhausen/rtf dest="{{rtf_root}}"
+
+    - name: Make virtualenv and activate
+      shell: "echo TBD"
+
+    - name: pip install -r requirements.txt
+      shell: "echo TBD"
+
+   - name: "python manage.py migrate"
+      shell: "echo TBD"
