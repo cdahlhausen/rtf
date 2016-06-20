@@ -1,0 +1,51 @@
+---
+
+- name: Users and Groups | Create home directory
+  file: path={{ wsgi_path }} state=directory
+
+- name: Users and Groups | Create the application user
+  user: name={{ wsgi_gunicorn_user }} state=present
+        shell={% if wsgi_ssh %}/bin/bash{% else %}/bin/nologin{% endif %}
+        createhome=yes home={{ wsgi_path }}
+
+- name: Users and Groups | Create bash profiles
+  template: src=bash_profile.j2 dest={{ wsgi_path }}.bash_profile
+  when: wsgi_ssh
+
+- name: Users and Groups | Create the application group
+  group: name={{ wsgi_gunicorn_group }} system=yes state=present
+
+- name: Users and Groups | Add the application user to the application group
+  user: name={{ wsgi_gunicorn_user }} group={{ wsgi_gunicorn_group }}
+        state=present
+
+- name: Access Control | Add our public deploy key to our applications authorized keys
+  authorized_key: user={{ wsgi_gunicorn_user }} key="{{ wsgi_ssh_key }}"
+                  state=present
+  tags:
+    - keys
+
+- stat: path=/home/vagrant
+  register: vagrant_home
+  tags:
+    - keys
+
+- name: Access Control | Get our vagrant key
+  command: grep -r "vagrant insecure public key" /home/vagrant/.ssh/authorized_keys
+  register: vagrant_key
+  when: vagrant_home.stat.isdir is defined and vagrant_home.stat.isdir
+  changed_when: false
+  tags:
+    - keys
+
+- name: Access Control | Copy our vagrant key if we are using vagrant
+  authorized_key: user={{ wsgi_gunicorn_user }}
+                  key="{{ vagrant_key.stdout }}" state=present
+  when: vagrant_home.stat.isdir is defined and vagrant_home.stat.isdir
+  tags:
+    - keys
+
+- name: Access Control | Grant sudo access for new users
+  template: src=sudoers.j2 dest=/etc/sudoers.d/{{ wsgi_project_name }} mode=0440
+  when: wsgi_sudo
+

@@ -1,0 +1,15 @@
+{{ wsgi_log_dir }}*.log {
+    su {{ wsgi_gunicorn_user }} {{ wsgi_gunicorn_group }}
+    daily
+    missingok
+    rotate 14
+    compress
+    dateext
+    notifempty
+    create 0640 {{ wsgi_gunicorn_user }} {{ wsgi_gunicorn_group }}
+    prerotate
+        if [ -f {{ wsgi_virtualenv }}bin/{{ wsgi_project_name }}.pid ]; then
+            kill -USR1 $(cat {{ wsgi_virtualenv }}bin/{{ wsgi_project_name }}.pid )
+        fi
+    endscript
+}

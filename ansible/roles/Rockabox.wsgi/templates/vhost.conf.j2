@@ -1,0 +1,77 @@
+upstream {{ wsgi_project_name }}_wsgi_server {
+  # fail_timeout=0 means we always retry an upstream even if it failed
+  # to return a good HTTP response (in case the Unicorn master nukes a
+  # single worker for timing out).
+
+  server unix:{{ wsgi_virtualenv }}run/gunicorn.sock fail_timeout=0;
+}
+
+server {
+    listen {{ wsgi_nginx_http_port }};
+    client_max_body_size 4G;
+
+    {% if wsgi_server_names %}
+    server_name  {{ wsgi_server_names|join(' ') }};
+    {% endif %}
+
+    keepalive_timeout {{ wsgi_keepalive_timeout }}s;
+    proxy_read_timeout {{ wsgi_proxy_read_timeout }}s;
+    proxy_send_timeout {{ wsgi_proxy_send_timeout }}s;
+    proxy_connect_timeout {{ wsgi_proxy_connect_timeout }}s;
+    send_timeout {{ wsgi_send_timeout }}s;
+    resolver_timeout {{ wsgi_resolver_timeout }}s;
+    resolver {{ wsgi_dns_resolver }};
+
+    {% if wsgi_ssl %}
+    include snippets/ssl.conf;
+    {% endif %}
+
+    {% if wsgi_static_dir %}
+    location /static/ {
+        alias   {{ wsgi_static_dir }};
+    }
+    {% endif %}
+
+    {% if wsgi_media_dir: %}
+    location /media/ {
+        alias   {{ wsgi_media_dir }};
+    }
+    {% endif %}
+
+    location / {
+        # if this file is found, show maintenance message
+         if (-f {{ wsgi_path }}maintenance.html) {
+            return 503;
+        }
+
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+
+        # Try to serve static files from nginx, no point in making an
+        # *application* server like Unicorn/Rainbows! serve static files.
+        if (!-f $request_filename) {
+            proxy_pass http://{{ wsgi_project_name }}_wsgi_server;
+            break;
+        }
+    }
+
+    # Error pages
+    error_page 500 502 504 /500.html;
+    location = /500.html {
+        root {{ wsgi_storage_dir }}{{ wsgi_project_name }};
+    }
+
+    error_page 503 /maintenance.html;
+    location = /maintenance.html {
+        root {{ wsgi_storage_dir }}{{ wsgi_project_name }};
+    }
+
+    access_log {{ wsgi_nginx_access_log_file }};
+    error_log {{ wsgi_nginx_error_log_file }};
+
+    {% for wsgi_nginx_include_path in wsgi_nginx_include_paths %}
+    include {{ wsgi_nginx_include_path }};
+    {% endfor %}
+}

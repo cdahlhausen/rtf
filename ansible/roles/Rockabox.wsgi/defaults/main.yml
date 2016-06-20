@@ -1,0 +1,81 @@
+---
+
+# Application settings.
+
+# Required (Override these!)
+wsgi_project_name: 'myproject'
+wsgi_wsgi_path: 'myproject.wsgi'
+wsgi_support_email: 'support@example.com'
+
+# Misc
+wsgi_storage_dir: '/mnt/'
+wsgi_update_apt_cache: yes
+wsgi_extra_apt_packages: []
+wsgi_extra_pip_packages: []
+wsgi_enable_python_image: no
+
+# Allow us SSH login as the application user
+wsgi_ssh: yes
+
+# The public part of the key we will use for deploys (defaults to your own)
+wsgi_ssh_key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
+# Give our user sudo access
+wsgi_sudo: yes
+
+# Prefix all your env vars with this (will be upper cased)
+wsgi_env_prefix: '{{ wsgi_project_name }}'
+
+# Application
+wsgi_virtualenv: '/var/lib/{{ wsgi_project_name }}/venv/'
+wsgi_path: '/var/www/{{ wsgi_project_name }}/'
+wsgi_release_dir: '{{ wsgi_path }}releases/'
+wsgi_log_dir: '/var/log/{{ wsgi_project_name }}/'
+wsgi_static_dir: '{{ wsgi_path }}current/static/'
+wsgi_media_dir: '{{ wsgi_storage_dir }}{{ wsgi_project_name }}/media/'
+wsgi_databases: []
+wsgi_env_vars: {}
+
+# Expose this app via a webserver
+wsgi_expose: yes
+
+# Gunicorn
+wsgi_gunicorn_user: '{{ wsgi_project_name }}'
+wsgi_gunicorn_group: '{{ wsgi_project_name }}'
+wsgi_gunicorn_num_workers: 5
+wsgi_gunicorn_max_requests: 0
+wsgi_request_line_limit: 8192
+
+# Nginx
+wsgi_server_names: []
+wsgi_nginx_http_port: 80
+
+# default dns reolution to googles DNS resolver
+wsgi_dns_resolver: 8.8.8.8
+
+wsgi_nginx_access_log_file: '{{ wsgi_log_dir }}nginx_access.log'
+wsgi_nginx_error_log_file: '{{ wsgi_log_dir }}nginx_error.log'
+
+# If set to yes, the webserver will listen on port 443 also
+wsgi_ssl: no
+wsgi_force_ssl: no
+wsgi_ssl_set_default_server: no
+wsgi_ssl_ocsp: no
+wsgi_ssl_diffie_hellman: no
+wsgi_nginx_include_paths: []
+wsgi_ssl_crt_file: '/etc/ssl/certs/{{ wsgi_project_name }}.crt'
+wsgi_ssl_key_file: '/etc/ssl/private/{{ wsgi_project_name }}.key'
+wsgi_ssl_staple_crt_file: '/etc/ssl/private/{{ wsgi_project_name }}.stapling.crt'
+wsgi_ssl_diffie_hellman_pem: '/etc/ssl/private/{{ wsgi_project_name }}.pem'
+
+# Cron tasks, see README for docs
+wsgi_cron_tasks: []
+
+# Timeouts (in seconds)
+wsgi_keepalive_timeout: 75
+wsgi_proxy_read_timeout: 60
+wsgi_proxy_send_timeout: 60
+wsgi_proxy_connect_timeout: 60
+wsgi_send_timeout: 60
+wsgi_resolver_timeout: 30
+wsgi_gunicorn_timeout: 30

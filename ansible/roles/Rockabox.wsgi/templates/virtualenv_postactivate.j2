@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Environmental variables
+
+# App settings
+export CURRENT_RELEASE='{{ wsgi_path }}current'
+
+# Misc settings
+export PIP_USE_MIRRORS=True
+export PS1="\[\033[0;33m\]\u\[\033[0;37m\]@\[\033[0;96m\]{{ wsgi_project_name }}\[\033[0;37m\]]\342\224\200[\[\033[0;32m\]\w\[\033[0;37m\]]\n\[\033[0;37m\]\342\224\224\342\224\200\342\224\200\342\225\274 \[\033[0m\]"
+
+# Project variables
+{% for database in wsgi_databases %}
+export {{ wsgi_env_prefix|upper }}_DB_{{ database.id|upper }}_NAME='{{ database.name }}'
+export {{ wsgi_env_prefix|upper }}_DB_{{ database.id|upper }}_USER='{{ database.user }}'
+export {{ wsgi_env_prefix|upper }}_DB_{{ database.id|upper }}_PASSWORD='{{ database.password }}'
+export {{ wsgi_env_prefix|upper }}_DB_{{ database.id|upper }}_HOST='{{ database.host }}'
+export {{ wsgi_env_prefix|upper }}_DB_{{ database.id|upper }}_PORT='{{ database.port }}'
+{% endfor %}
+
+export {{ wsgi_env_prefix|upper }}_RELEASE_DIR='{{ wsgi_release_dir }}'
+export {{ wsgi_env_prefix|upper }}_APP_PATH='{{ wsgi_path }}'
+export {{ wsgi_env_prefix|upper }}_APP_NAME='{{ wsgi_project_name }}'
+export {{ wsgi_env_prefix|upper }}_VENV='{{ wsgi_virtualenv }}'
+export {{ wsgi_env_prefix|upper }}_LOG_DIR='{{ wsgi_log_dir }}'
+export {{ wsgi_env_prefix|upper }}_PID='{{ wsgi_virtualenv }}bin/{{ wsgi_project_name }}.pid'
+export {{ wsgi_env_prefix|upper }}_STATIC_DIR='{{ wsgi_static_dir }}'
+export {{ wsgi_env_prefix|upper }}_MEDIA_DIR='{{ wsgi_media_dir }}'
+
+# Additional project specific env vars
+{% for key, value in wsgi_env_vars.iteritems() %}
+export {{ key|upper }}='{{ value }}'
+{% endfor %}

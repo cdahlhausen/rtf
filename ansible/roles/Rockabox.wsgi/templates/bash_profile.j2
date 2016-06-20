@@ -1,0 +1,10 @@
+# Misc settings and Aliases
+force_color_prompt=True
+alias ll='ls -lah --color=auto'
+alias l='ls -1 --color=auto'
+
+# If the user has a virtual env, source activate and postactivate
+if [ -d {{ wsgi_virtualenv }} ]; then
+    . {{ wsgi_virtualenv }}bin/activate
+    . {{ wsgi_virtualenv }}bin/postactivate
+fi

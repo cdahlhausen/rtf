@@ -1,0 +1,36 @@
+---
+
+- name: Ensure OpenSSl and libssl are the latest versions
+  apt: name={{ item }} update_cache={{ wsgi_update_apt_cache }} state=latest
+  with_items:
+    - openssl
+    - libssl-dev
+    - libssl-doc
+
+- name: Install base packages
+  apt: name={{ item }} update_cache={{ wsgi_update_apt_cache }} force=yes
+       state=installed
+  with_items:
+    - build-essential
+    - git
+    - htop
+    - python-dev
+    - python-pip
+    - python-pycurl
+    - python-virtualenv
+    - supervisor
+
+- name: Upgrade pip to the latest version
+  pip: name=pip state=latest
+
+- name: Install any additional packages through apt
+  apt: name={{ item }} update_cache={{ wsgi_update_apt_cache }} force=yes
+       state=installed
+  with_items: wsgi_extra_apt_packages
+
+- name: Create the log rotation script
+  template: src=logrotate.j2
+            dest="/etc/logrotate.d/{{ wsgi_project_name }}"
+            mode=0644 owner=root group=root
+  tags:
+    - logs

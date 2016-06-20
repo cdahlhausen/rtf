@@ -1,0 +1,23 @@
+---
+
+- name: Cron | Setup App cron tasks
+  cron:
+    name: "App cron task {{ item.name }}"
+    user: "{{ item.user }}"
+    day: "{{ item.frequency.day | default('*') }}"
+    hour: "{{ item.frequency.hour | default('*') }}"
+    minute: "{{ item.frequency.minute | default('*') }}"
+    month: "{{ item.frequency.month | default('*') }}"
+    weekday: "{{ item.frequency.weekday | default('*') }}"
+    job:
+      "{% if (item.lock | default(false)) %}
+      flock -n {{ item.slug }}.lockfile
+      {% endif %}
+      /bin/bash -c '
+      source ~/.bash_profile &&
+      {% for variable in (item.environment|default({})).iteritems() %}
+        export {{ variable[0] }}=\"{{ variable[1] }}\" &&
+      {%- endfor %}
+      {{ item.command }}
+      &>> {{ item.logfile }}'"
+  with_items: wsgi_cron_tasks

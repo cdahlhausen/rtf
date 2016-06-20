@@ -1,0 +1,14 @@
+---
+
+- name: restart applications
+  supervisorctl: name={{ wsgi_project_name }} state=restarted
+  when: deployed_application.stat.exists == true
+
+- name: restart nginx
+  service: name=nginx state=restarted
+
+- name: reread supervisor config
+  command: supervisorctl reread
+
+- name: update supervisor
+  command: supervisorctl update

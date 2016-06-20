@@ -1,0 +1,16 @@
+---
+
+- name: Ensure that the env file permissions are set properly
+  file: path={{ wsgi_virtualenv }} recurse=yes state=directory
+        owner={{ wsgi_gunicorn_user }} group={{ wsgi_gunicorn_group }}
+  notify: restart applications
+
+- name: Ensure that the application file permissions are set properly
+  file: path={{ wsgi_path }} recurse=yes owner={{ wsgi_gunicorn_user }}
+        group={{ wsgi_gunicorn_group }} state=directory
+  notify: restart applications
+
+- name: Ensure that the log file permissions are set properly
+  file: path={{ wsgi_log_dir }} owner={{ wsgi_gunicorn_user }}
+        group={{ wsgi_gunicorn_group }} state=directory
+  notify: restart applications

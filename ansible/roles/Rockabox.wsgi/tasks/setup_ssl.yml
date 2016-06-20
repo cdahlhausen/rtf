@@ -1,0 +1,5 @@
+---
+
+- name: Add our nginx SSL configuration file
+  template: src=ssl.j2 dest=/etc/nginx/snippets/ssl.conf backup=yes
+  notify: restart nginx

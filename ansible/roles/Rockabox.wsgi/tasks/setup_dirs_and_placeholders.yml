@@ -1,0 +1,16 @@
+---
+
+- name: Create the application log folder
+  file: path={{ wsgi_log_dir }} owner={{ wsgi_gunicorn_user }}
+        group={{ wsgi_gunicorn_group }} mode=0774 state=directory
+
+- name: Create persistent folders
+  file: path={{ item }} state=directory
+        owner={{ wsgi_gunicorn_user }} group={{ wsgi_gunicorn_group }}
+  when: item is defined
+  with_items:
+    - '{{ wsgi_media_dir }}'
+
+- name: Create releases directory
+  file: path={{ wsgi_release_dir }} state=directory
+        owner={{ wsgi_gunicorn_user }} group={{ wsgi_gunicorn_group }}

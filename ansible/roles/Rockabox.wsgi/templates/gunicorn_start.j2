@@ -1,0 +1,40 @@
+#!/bin/bash
+
+NAME="{{ wsgi_project_name }}"
+SOCKFILE={{ wsgi_virtualenv }}run/gunicorn.sock
+USER={{ wsgi_gunicorn_user }}
+GROUP={{ wsgi_gunicorn_group }}
+NUM_WORKERS={{ wsgi_gunicorn_num_workers }}
+TIMEOUT={{ wsgi_gunicorn_timeout }}
+
+# Set this to 0 for unlimited requests. During development, you might want to
+# set this to 1 to automatically restart the process on each request (i.e. your
+# code will be reloaded on every request).
+MAX_REQUESTS={{ wsgi_gunicorn_max_requests }}
+
+echo "Starting $NAME as `whoami`"
+
+# Activate the virtual environment.
+source {{ wsgi_virtualenv }}bin/activate
+
+# Set additional environment variables.
+source {{ wsgi_virtualenv }}bin/postactivate
+
+# Create the run directory if it doesn't exist.
+RUNDIR=$(dirname $SOCKFILE)
+test -d $RUNDIR || mkdir -p $RUNDIR
+
+# Programs meant to be run under supervisor should not daemonize themselves
+# (do not use --daemon).
+cd $CURRENT_RELEASE
+exec gunicorn {{ wsgi_wsgi_path }} \
+        --name $NAME \
+        --workers $NUM_WORKERS \
+        --max-requests $MAX_REQUESTS \
+        --user=$USER --group=$GROUP \
+        --timeout=$TIMEOUT \
+        --log-level=critical \
+        --log-file={{ wsgi_log_dir }}{{ wsgi_project_name }}.log \
+        --pid={{ wsgi_virtualenv }}bin/{{ wsgi_project_name }}.pid \
+        --limit-request-line={{ wsgi_request_line_limit }} \
+        --bind=unix:$SOCKFILE &>> {{ wsgi_log_dir }}{{ wsgi_project_name }}.log

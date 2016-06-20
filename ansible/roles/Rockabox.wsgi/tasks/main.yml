@@ -1,0 +1,36 @@
+---
+
+- name: Load in project specific vars
+  include_vars: "{{ vars_file }}"
+  when: vars_file is defined
+  tags:
+    - env_vars
+    - always
+
+- name: Check if a project has been deployed
+  stat: path='{{ wsgi_path }}current'
+  register: deployed_application
+  changed_when: false
+  tags:
+    - env_vars
+    - always
+
+- include: setup_system.yml
+
+- include: create_users_and_groups.yml
+
+- include: setup_cron_tasks.yml
+
+- include: setup_dirs_and_placeholders.yml
+
+- include: setup_virtualenv.yml
+
+- include: set_file_permissions.yml
+
+- include: setup_supervisor.yml
+
+- include: setup_ssl.yml
+  when: wsgi_ssl
+
+- include: setup_nginx.yml
+  when: wsgi_expose

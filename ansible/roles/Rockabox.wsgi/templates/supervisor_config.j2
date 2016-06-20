@@ -1,0 +1,5 @@
+[program:{{ wsgi_project_name }}]
+command = {{ wsgi_virtualenv }}bin/gunicorn_start
+user = {{ wsgi_gunicorn_user }}
+stdout_errfile = {{ wsgi_log_dir }}supervisor.log
+startsecs = 5

@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: Rockabox Devs
+  company: Rockabox
+  description: "A comprehensive wsgi app container, using VirtualEnv, Gunicorn, Nginx & Supervisor"
+  min_ansible_version: 1.2
+  license: MIT
+  platforms:
+  - name: Ubuntu
+    versions:
+    - all
+  categories:
+    - development
+    - packaging
+    - system
+    - web
+dependencies: []

@@ -1,0 +1,56 @@
+---
+
+- name: Virtualenv | Create the virtualenv
+  command: virtualenv {{ wsgi_virtualenv }} --no-site-packages
+           creates={{ wsgi_virtualenv }}bin/activate
+
+- name: Virtualenv | Ensure we have Gunicorn installed
+  pip: name=gunicorn state=present
+       virtualenv={{ wsgi_virtualenv }}
+
+- name: Virtualenv | Create the Gunicorn script file
+  template: src=gunicorn_start.j2
+            dest={{ wsgi_virtualenv }}bin/gunicorn_start
+            owner={{ wsgi_gunicorn_user }}
+            group={{ wsgi_gunicorn_group }}
+            mode=0755
+            backup=yes
+
+- name: Virtualenv | Create the virtualenv postactivate script to set environment variables
+  template: src=virtualenv_postactivate.j2
+            dest={{ wsgi_virtualenv }}bin/postactivate
+            owner={{ wsgi_gunicorn_user }}
+            group={{ wsgi_gunicorn_group }}
+            mode=0640
+            backup=yes
+  tags:
+    - env_vars
+  notify: restart applications
+
+- name: Virtualenv | Install any additional packages through pip
+  pip: name={{ item.name }}
+       version={{ item.version }}
+       state=present
+       virtualenv={{ wsgi_virtualenv }}
+  with_items: wsgi_extra_pip_packages
+
+- name: Install native dependencies for PIL/Pillow
+  apt: name={{ item }}
+       update_cache={{ wsgi_update_apt_cache }}
+       force=yes
+       state=installed
+  with_items:
+    - libjpeg-dev
+    - libfreetype6-dev
+    - zlib1g-dev
+  when: wsgi_enable_python_image
+
+- name: Enable PIL/Pillow optional libraries to be found by pip
+  file: src=/usr/lib/{{ ansible_architecture }}-linux-gnu/{{ item }}
+        dest=/usr/lib/{{ item }}
+        state=link
+  with_items:
+      - libfreetype.so
+      - libz.so
+      - libjpeg.so
+  when: wsgi_enable_python_image

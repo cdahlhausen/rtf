@@ -1,0 +1,38 @@
+---
+
+- name: Create the Nginx configuration file
+  template: src=vhost.conf.j2
+            dest=/etc/nginx/sites-available/{{ wsgi_project_name }}
+            backup=yes
+  notify:
+    - restart nginx
+
+- name: Ensure that the default site is disabled
+  file: path=/etc/nginx/sites-enabled/default state=absent
+
+- name: Ensure that the application site is enabled
+  file: src=/etc/nginx/sites-available/{{ wsgi_project_name }}
+        dest=/etc/nginx/sites-enabled/{{ wsgi_project_name }}
+        state=link
+  notify:
+    - restart nginx
+
+- name: Create the maintenance page
+  template: src=maintenance.html.j2
+            dest="{{ wsgi_storage_dir }}{{ wsgi_project_name }}/maintenance.html"
+            mode=0664
+  notify:
+    - restart nginx
+
+- name: Create the 500 error page
+  template: src=500.html.j2
+            dest="{{ wsgi_storage_dir }}{{ wsgi_project_name }}/500.html"
+            mode=0664
+  notify:
+    - restart nginx
+
+- name: Copy included Nginx configuration files
+  copy: src={{ item }}
+        dest=/etc/nginx/{{ item }}
+        backup=yes
+  with_items: wsgi_nginx_include_paths

@@ -1,0 +1,18 @@
+---
+
+- name: Test the wsgi_app_container role
+  hosts: all
+  sudo: yes
+  sudo_user: root
+  vars_files:
+    - defaults/main.yml
+  pre_tasks:
+    - name: Ensure nginx is installed
+      apt: name=nginx update_cache=true state=installed
+  tasks:
+    - include: tasks/main.yml
+  handlers:
+    - include: handlers/main.yml
+  vars:
+    wsgi_project_name: 'my_project'
+    wsgi_wsgi_path: 'my.wsgi.path'
