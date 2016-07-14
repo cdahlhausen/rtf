@@ -1,0 +1,4 @@
+---
+# defaults file for ansible-mapr_python
+
+proxy_env: { }
